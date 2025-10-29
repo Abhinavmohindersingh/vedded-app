@@ -24,7 +24,7 @@ import {
   Loader2,
 } from "lucide-react";
 
-export default function LandingPage() {
+export default function App() {
   const [formData, setFormData] = useState({
     businessDescription: "",
     industry: "",
