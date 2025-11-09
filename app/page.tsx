@@ -1,8 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-
-// Lucide Icons
 import {
   Sparkles,
   Zap,
@@ -24,7 +22,14 @@ import {
   Loader2,
 } from "lucide-react";
 
-function NameCard({ name, domain, rationale, available }) {
+interface NameCardProps {
+  name: string;
+  domain: string;
+  rationale: string;
+  available: boolean | null;
+}
+
+function NameCard({ name, domain, rationale, available }: NameCardProps) {
   return (
     <motion.div
       className="relative group cursor-pointer"
@@ -54,40 +59,19 @@ function NameCard({ name, domain, rationale, available }) {
         <p className="mt-1 text-purple-300/60">{domain}</p>
       </div>
 
-      {/* Tooltip Overlay (visible on group-hover) */}
-      {/* FIXED OVERLAY - Larger size with solid background */}
+      {/* Tooltip Overlay */}
       <div
         className="
-  absolute inset-0 p-4
-  bg-black/95 
-  rounded-2xl
-  
-  /* Solid color background - No transparency issues */
-  backdrop-blur-none
-  
-  /* Hover states */
-  opacity-0 invisible
-  group-hover:opacity-100 group-hover:visible
-  
-  /* Smooth transition */
-  transition-all duration-300 ease-in-out
-  
-  /* Layering */
-  z-20
-  
-  /* Center content with more padding */
-  flex items-center justify-center text-center
-"
+          absolute inset-0 p-4 bg-black/95 rounded-2xl
+          backdrop-blur-none opacity-0 invisible
+          group-hover:opacity-100 group-hover:visible
+          transition-all duration-300 ease-in-out z-20
+          flex items-center justify-center text-center
+        "
       >
         <div className="p-6">
-          {" "}
-          {/* Inner container with padding */}
-          <div className="mb-4 text-sm font-semibold text-purple-200 uppercase tracking-wide">
-            💡 Creative Rationale
-          </div>
           <p className="text-white/95 font-medium leading-relaxed text-sm max-w-[95%] mx-auto px-4">
-            {nameObj.rationale ||
-              `A premium brand name crafted for ${formData.industry || "your business"} with elegant phonetics, timeless appeal, and strategic positioning that resonates with your target audience.`}
+            {rationale}
           </p>
         </div>
       </div>
@@ -112,6 +96,7 @@ export default function App() {
       name: string;
       domain: string;
       available: boolean | null;
+      rationale?: string;
     }>
   >([]);
 
@@ -136,14 +121,11 @@ export default function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      // First, save to waitlist
+      // Save to waitlist
       const waitlistResponse = await fetch("/api/waitlist", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formData.email,
           industry: formData.industry,
@@ -151,17 +133,14 @@ export default function App() {
         }),
       });
 
-      // Don't block if waitlist fails, continue generating names
       if (waitlistResponse.ok) {
         console.log("Email saved to waitlist!");
       }
 
-      // Then generate names
+      // Generate names
       const response = await fetch("/api/generate-names", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           industry: formData.industry,
           keywords: formData.businessDescription,
@@ -170,7 +149,6 @@ export default function App() {
       });
 
       const data = await response.json();
-
       if (data.success) {
         setGeneratedNames(data.names);
         setShowResults(true);
@@ -186,6 +164,10 @@ export default function App() {
 
   const handleWaitlistSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.email) {
+      alert("Please enter your email.");
+      return;
+    }
     setEmailSubmitted(true);
   };
 
@@ -287,7 +269,7 @@ export default function App() {
 
   return (
     <>
-      {/* PROFESSIONAL HEADER */}
+      {/* Header */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
@@ -301,7 +283,6 @@ export default function App() {
         }}
       >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          {/* Logo - Using the V image */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -317,7 +298,6 @@ export default function App() {
             </span>
           </motion.div>
 
-          {/* Nav Links */}
           <nav className="hidden md:flex items-center gap-8">
             {["Features", "How It Works", "Waitlist"].map((item) => (
               <motion.a
@@ -332,7 +312,6 @@ export default function App() {
             ))}
           </nav>
 
-          {/* CTA Button */}
           <motion.button
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
@@ -347,7 +326,6 @@ export default function App() {
             <ArrowRight className="w-4 h-4 relative z-10" />
           </motion.button>
 
-          {/* Mobile Menu */}
           <button className="md:hidden text-white">
             <Menu className="w-6 h-6" />
           </button>
@@ -355,15 +333,13 @@ export default function App() {
       </header>
 
       <div className="min-h-screen bg-black text-white overflow-hidden pt-20">
-        {/* Global 3D Lighting Effect - Violet/Purple Theme */}
+        {/* Lighting & Grid */}
         <div
           className="fixed inset-0 pointer-events-none z-0 transition-opacity duration-300"
           style={{
             background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(139, 92, 246, 0.15), transparent 40%)`,
           }}
         />
-
-        {/* Animated Grid Background */}
         <div className="fixed inset-0 opacity-[0.15]">
           <div
             className="absolute inset-0"
@@ -375,9 +351,8 @@ export default function App() {
           />
         </div>
 
-        {/* Hero Section */}
+        {/* Hero */}
         <section className="relative min-h-screen flex items-center justify-center">
-          {/* Dramatic gradient orbs */}
           <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gradient-to-br from-violet-600/30 to-purple-600/30 rounded-full blur-[150px] animate-pulse" />
           <div
             className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-fuchsia-600/30 to-pink-600/30 rounded-full blur-[150px] animate-pulse"
@@ -395,7 +370,6 @@ export default function App() {
               transition={{ duration: 0.8 }}
               className="text-center max-w-5xl mx-auto"
             >
-              {/* Badge */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -413,7 +387,6 @@ export default function App() {
                 </span>
               </motion.div>
 
-              {/* Headline */}
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -433,7 +406,6 @@ export default function App() {
                 </span>
               </motion.h1>
 
-              {/* Subheadline */}
               <motion.p
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -458,15 +430,12 @@ export default function App() {
                   }}
                 >
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/50 to-transparent" />
-
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <input
                       type="text"
                       placeholder="What does your business do?"
                       className="w-full bg-black/50 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500/50 transition-all shadow-inner"
-                      style={{
-                        boxShadow: "inset 0 2px 10px rgba(0,0,0,0.5)",
-                      }}
+                      style={{ boxShadow: "inset 0 2px 10px rgba(0,0,0,0.5)" }}
                       value={formData.businessDescription}
                       onChange={(e) =>
                         setFormData({
@@ -476,7 +445,6 @@ export default function App() {
                       }
                       required
                     />
-
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="relative">
                         <select
@@ -517,7 +485,6 @@ export default function App() {
                         </select>
                         <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                       </div>
-
                       <div className="relative">
                         <select
                           className="w-full bg-black/50 border border-white/10 rounded-xl px-6 py-4 text-white focus:outline-none focus:border-violet-500/50 transition-all appearance-none shadow-inner"
@@ -549,21 +516,17 @@ export default function App() {
                         <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                       </div>
                     </div>
-
                     <input
                       type="email"
                       placeholder="Your email"
                       className="w-full bg-black/50 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-violet-500/50 transition-all shadow-inner"
-                      style={{
-                        boxShadow: "inset 0 2px 10px rgba(0,0,0,0.5)",
-                      }}
+                      style={{ boxShadow: "inset 0 2px 10px rgba(0,0,0,0.5)" }}
                       value={formData.email}
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
                       required
                     />
-
                     <motion.button
                       whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
@@ -593,7 +556,7 @@ export default function App() {
                   </form>
                 </motion.div>
               ) : (
-                /* AI-Generated Results */
+                /* Results */
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -608,7 +571,6 @@ export default function App() {
                     }}
                   >
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/50 to-transparent" />
-
                     <h3 className="text-2xl font-bold mb-2 text-white">
                       Here are AI-generated names for your {formData.industry}{" "}
                       business:
@@ -616,100 +578,23 @@ export default function App() {
                     <p className="text-gray-400 mb-8">
                       Fresh, unique names powered by OpenAI
                     </p>
-
                     <div className="grid md:grid-cols-2 gap-4">
                       {generatedNames.map((nameObj, index) => (
-                        <motion.div
+                        <NameCard
                           key={index}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.6, delay: index * 0.1 }}
-                          whileHover={{ y: -5 }}
-                          className={`bg-gradient-to-b from-white/[0.07] to-white/[0.02] 
-                  backdrop-blur-sm rounded-2xl p-6 border 
-                  relative group cursor-pointer 
-                  position-relative  /* Important for absolute children */
-                  ${
-                    nameObj.available === true
-                      ? "border-green-500/50 hover:border-green-500"
-                      : nameObj.available === false
-                        ? "border-red-500/50 hover:border-red-500"
-                        : "border-white/10 hover:border-violet-500/50"
-                  } transition-all`}
-                          style={{
-                            boxShadow:
-                              "0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)",
-                          }}
-                        >
-                          {/* Your existing top gradient line */}
-                          <div
-                            className="absolute inset-x-0 top-0 h-px 
-                      bg-gradient-to-r from-transparent via-violet-400/50 to-transparent 
-                      opacity-0 group-hover:opacity-100 transition-opacity"
-                          />
-
-                          {/* MAIN CONTENT - Your existing styling stays the same */}
-                          <div className="relative z-10">
-                            <h4
-                              className="text-2xl font-bold mb-2 text-white flex items-center justify-between"
-                              style={{
-                                textShadow: "0 0 20px rgba(139, 92, 246, 0.5)",
-                              }}
-                            >
-                              {nameObj.name}
-                              {nameObj.available === true && (
-                                <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full border border-green-500/50">
-                                  Available
-                                </span>
-                              )}
-                              {nameObj.available === false && (
-                                <span className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full border border-red-500/50">
-                                  Taken
-                                </span>
-                              )}
-                            </h4>
-                            <p className="text-sm text-gray-400">
-                              {nameObj.domain ||
-                                `${nameObj.name.toLowerCase()}.com`}
-                            </p>
-                          </div>
-
-                          {/* FIXED OVERLAY - Larger size with solid background */}
-                          <div
-                            className="
-  absolute inset-0 p-4
-  bg-black/95 
-  rounded-2xl
-  
-  /* Solid color background - No transparency issues */
-  backdrop-blur-none
-  
-  /* Hover states */
-  opacity-0 invisible
-  group-hover:opacity-100 group-hover:visible
-  
-  /* Smooth transition */
-  transition-all duration-300 ease-in-out
-  
-  /* Layering */
-  z-20
-  
-  /* Center content with more padding */
-  flex items-center justify-center text-center
-"
-                          >
-                            <div className="p-6">
-                              {" "}
-                              <p className="text-white/95 font-medium leading-relaxed text-sm max-w-[95%] mx-auto px-4">
-                                {nameObj.rationale ||
-                                  `A premium brand name crafted for ${formData.industry || "your business"} with elegant phonetics, timeless appeal, and strategic positioning that resonates with your target audience.`}
-                              </p>
-                            </div>
-                          </div>
-                        </motion.div>
+                          name={nameObj.name}
+                          domain={
+                            nameObj.domain ||
+                            `${nameObj.name.toLowerCase()}.com`
+                          }
+                          rationale={
+                            nameObj.rationale ||
+                            `A premium brand name crafted for ${formData.industry || "your business"} with elegant phonetics, timeless appeal, and strategic positioning.`
+                          }
+                          available={nameObj.available}
+                        />
                       ))}
                     </div>
-
                     <div className="mt-8 pt-8 border-t border-white/10">
                       <p className="text-lg text-gray-300 mb-6">
                         Want domain availability checks and trademark
@@ -732,7 +617,6 @@ export default function App() {
                         Join Waitlist for Full Features
                         <ArrowRight className="w-5 h-5" />
                       </motion.button>
-
                       <button
                         onClick={() => setShowResults(false)}
                         className="ml-4 text-gray-400 hover:text-white transition-colors"
