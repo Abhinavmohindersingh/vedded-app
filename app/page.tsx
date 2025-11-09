@@ -24,6 +24,77 @@ import {
   Loader2,
 } from "lucide-react";
 
+function NameCard({ name, domain, rationale, available }) {
+  return (
+    <motion.div
+      className="relative group cursor-pointer"
+      variants={{
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0 },
+      }}
+    >
+      {/* Card Content */}
+      <div className="h-full p-6 rounded-2xl bg-white/5 border border-white/10 shadow-lg transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10">
+        <div className="flex justify-between items-center">
+          <span className="text-2xl font-bold text-white tracking-tight">
+            {name}
+          </span>
+          {available !== null && (
+            <span
+              className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                available
+                  ? "bg-green-400/10 text-green-300"
+                  : "bg-red-400/10 text-red-300"
+              }`}
+            >
+              {available ? "Available" : "Taken"}
+            </span>
+          )}
+        </div>
+        <p className="mt-1 text-purple-300/60">{domain}</p>
+      </div>
+
+      {/* Tooltip Overlay (visible on group-hover) */}
+      {/* FIXED OVERLAY - Larger size with solid background */}
+      <div
+        className="
+  absolute inset-0 p-4
+  bg-black/95 
+  rounded-2xl
+  
+  /* Solid color background - No transparency issues */
+  backdrop-blur-none
+  
+  /* Hover states */
+  opacity-0 invisible
+  group-hover:opacity-100 group-hover:visible
+  
+  /* Smooth transition */
+  transition-all duration-300 ease-in-out
+  
+  /* Layering */
+  z-20
+  
+  /* Center content with more padding */
+  flex items-center justify-center text-center
+"
+      >
+        <div className="p-6">
+          {" "}
+          {/* Inner container with padding */}
+          <div className="mb-4 text-sm font-semibold text-purple-200 uppercase tracking-wide">
+            💡 Creative Rationale
+          </div>
+          <p className="text-white/95 font-medium leading-relaxed text-sm max-w-[95%] mx-auto px-4">
+            {nameObj.rationale ||
+              `A premium brand name crafted for ${formData.industry || "your business"} with elegant phonetics, timeless appeal, and strategic positioning that resonates with your target audience.`}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function App() {
   const [formData, setFormData] = useState({
     businessDescription: "",
@@ -554,42 +625,87 @@ export default function App() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.6, delay: index * 0.1 }}
                           whileHover={{ y: -5 }}
-                          className={`bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-sm rounded-2xl p-6 border ${
-                            nameObj.available === true
-                              ? "border-green-500/50 hover:border-green-500"
-                              : nameObj.available === false
-                                ? "border-red-500/50 hover:border-red-500"
-                                : "border-white/10 hover:border-violet-500/50"
-                          } transition-all relative group`}
+                          className={`bg-gradient-to-b from-white/[0.07] to-white/[0.02] 
+                  backdrop-blur-sm rounded-2xl p-6 border 
+                  relative group cursor-pointer 
+                  position-relative  /* Important for absolute children */
+                  ${
+                    nameObj.available === true
+                      ? "border-green-500/50 hover:border-green-500"
+                      : nameObj.available === false
+                        ? "border-red-500/50 hover:border-red-500"
+                        : "border-white/10 hover:border-violet-500/50"
+                  } transition-all`}
                           style={{
                             boxShadow:
                               "0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)",
                           }}
                         >
-                          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          {/* Your existing top gradient line */}
+                          <div
+                            className="absolute inset-x-0 top-0 h-px 
+                      bg-gradient-to-r from-transparent via-violet-400/50 to-transparent 
+                      opacity-0 group-hover:opacity-100 transition-opacity"
+                          />
 
-                          <h4
-                            className="text-2xl font-bold mb-2 text-white flex items-center justify-between"
-                            style={{
-                              textShadow: "0 0 20px rgba(139, 92, 246, 0.5)",
-                            }}
+                          {/* MAIN CONTENT - Your existing styling stays the same */}
+                          <div className="relative z-10">
+                            <h4
+                              className="text-2xl font-bold mb-2 text-white flex items-center justify-between"
+                              style={{
+                                textShadow: "0 0 20px rgba(139, 92, 246, 0.5)",
+                              }}
+                            >
+                              {nameObj.name}
+                              {nameObj.available === true && (
+                                <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full border border-green-500/50">
+                                  Available
+                                </span>
+                              )}
+                              {nameObj.available === false && (
+                                <span className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full border border-red-500/50">
+                                  Taken
+                                </span>
+                              )}
+                            </h4>
+                            <p className="text-sm text-gray-400">
+                              {nameObj.domain ||
+                                `${nameObj.name.toLowerCase()}.com`}
+                            </p>
+                          </div>
+
+                          {/* FIXED OVERLAY - Larger size with solid background */}
+                          <div
+                            className="
+  absolute inset-0 p-4
+  bg-black/95 
+  rounded-2xl
+  
+  /* Solid color background - No transparency issues */
+  backdrop-blur-none
+  
+  /* Hover states */
+  opacity-0 invisible
+  group-hover:opacity-100 group-hover:visible
+  
+  /* Smooth transition */
+  transition-all duration-300 ease-in-out
+  
+  /* Layering */
+  z-20
+  
+  /* Center content with more padding */
+  flex items-center justify-center text-center
+"
                           >
-                            {nameObj.name}
-                            {nameObj.available === true && (
-                              <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full border border-green-500/50">
-                                Available
-                              </span>
-                            )}
-                            {nameObj.available === false && (
-                              <span className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full border border-red-500/50">
-                                Taken
-                              </span>
-                            )}
-                          </h4>
-                          <p className="text-sm text-gray-400">
-                            {nameObj.domain ||
-                              `${nameObj.name.toLowerCase()}.com`}
-                          </p>
+                            <div className="p-6">
+                              {" "}
+                              <p className="text-white/95 font-medium leading-relaxed text-sm max-w-[95%] mx-auto px-4">
+                                {nameObj.rationale ||
+                                  `A premium brand name crafted for ${formData.industry || "your business"} with elegant phonetics, timeless appeal, and strategic positioning that resonates with your target audience.`}
+                              </p>
+                            </div>
+                          </div>
                         </motion.div>
                       ))}
                     </div>
